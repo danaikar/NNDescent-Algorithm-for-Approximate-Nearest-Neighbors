@@ -1,83 +1,64 @@
-**Documentation**
-- **CONCEPT:**
+# 📌 Nearest Neighbor Search (NNS)
 
-Nearest neighbor search (NSS) is an optimization problem that aims to find the point in a given dataset that is closest to a specific data point, by measuring the distance using a metric function.
-The project consists of 2 KNSS methods, Brute-Force and NN-Descent.
+Nearest neighbor search (NSS) is an optimization problem that aims to find the point in a given dataset that is closest to a specific data point by measuring the distance using a metric function. This project consists of two KNNS methods, **Brute-Force** and **NN-Descent**.
 
+## K-Nearest Neighbors Search Methods
 
-1. ***KNN_BruteForce*** class for K-Nearest Neighbors Search:
-The KNNBruteForce method computes the K-nearest neighbors for every data point within the dataset by calculating the distance between itself and every other data point. We make the assumption that the datasets consist of float numbers. 
+The **KNN Brute-Force** method computes the K-nearest neighbors for every data point within the dataset by calculating the distance between itself and every other data point. The assumption is that datasets consist of floating-point numbers.
 
-2. ***NN_Descent*** class for K-Nearest Neighbors Search:
-KNNDescent is a graph-based algorithm for approximate k-Nearest Neighbor Search (KNN). It constructs a K-nearest neighbors graph (KNNG) to find K-nearest neighbors for each data point in a dataset. The algorithm begins by creating a random graph where each vertex is connected to K random neighbors. Then, it  updates the graph by computing potential neighbors based on their distance and adding them to the graph, so at the end it has the K-nearest neighbors for each vertex.
-The calculatePotentialNewNeighbors method computes the potential neighbors for each vertex by considering both neighbors and reverse neighbors of a vertex, based on their distances. Specifically, for each pair of potential neighbor:
-It calculates the distance between two vertices using the specified metric.
-It checks if the calculated distance is greater than the distance to the furthest neighbor. 
-If the distance is greater, the comparison is skipped, as the new potential neighbor is not closer than the current farthest neighbor.
-Otherwise, a new potential neighbor is found to be closer so it adds it to the set of potential neighbors and updateGraph is being called .
-UpdateGraph deletes the farthest neighbor, inserts the needed one and finally updates the reverse neigbors accordingly. This process is being repeated for each vertex, so that we ensure that the whole graph has been updated.
+The **NN-Descent** method is a graph-based algorithm for approximate k-Nearest Neighbor Search (KNN). It constructs a K-nearest neighbors graph (KNNG) to find K-nearest neighbors for each data point in a dataset. The algorithm begins by creating a random graph where each vertex is connected to K random neighbors. It then updates the graph by computing potential neighbors based on their distance and adding them to the graph, ensuring that at the end of the process, each vertex has its K-nearest neighbors.
 
+The `calculatePotentialNewNeighbors` method computes potential neighbors for each vertex by considering both its neighbors and reverse neighbors based on their distances. For each pair of potential neighbors, the algorithm calculates the distance between two vertices using the specified metric. If the calculated distance is greater than the distance to the farthest neighbor, the comparison is skipped since the new potential neighbor is not closer than the current farthest neighbor. If the new neighbor is found to be closer, it is added to the set of potential neighbors, and `updateGraph` is called. The `updateGraph` method removes the farthest neighbor, inserts the new one, and updates the reverse neighbors accordingly. This process repeats for each vertex to ensure that the entire graph remains updated.
 
+## Classes
 
-- **CLASSES:**
-1. KNNDescent:
-KNNDescent class keeps the number of neighbors to be found (K), the size of the dataset (size), the dimensions of the dataset (dimensions) and the distance metric between datapoints (distanceFunction). Lastly, it keeps an array of pointers to Vertex objects, where each Vertex represents a datapoint in the dataset (vertexArray). 
+The `KNNDescent` class stores the number of neighbors to be found (K), the size and dimensions of the dataset, and the distance metric between data points. It also contains an array of pointers to `Vertex` objects, where each `Vertex` represents a data point in the dataset.
 
-2. Vertex:
-Vertex class keeps a pointer to the actual data (datapoint), and 3 sets - Nearest Neighbors of this vertex (NN), Reverse Nearest Neighbors of this vertex (RNN) and potential neighbors that might replace other neighbors of this vertex in the future (PN).
-Finaly, it keeps a map that stores distances to other vertices (distances).
+The `Vertex` class maintains a pointer to the actual data (datapoint) and three sets: Nearest Neighbors (NN), Reverse Nearest Neighbors (RNN), and potential neighbors (PN) that might replace other neighbors of this vertex in the future. Additionally, it keeps a map that stores distances to other vertices.
 
-3. Neighbor:
-Neighbor class keeps a pointer to an integer representing the ID of the neighbor vertex (id) and a pointer to a double representing the distance between the current vertex and this neighbor.
+The `Neighbor` class contains a pointer to an integer representing the ID of the neighbor vertex and a pointer to a double representing the distance between the current vertex and this neighbor.
 
-Some datasets are uploaded on this repository under the directory "datasets". The user's distance metric function
-must be present on the file main.cpp. There is already an euclidean distance metric (for an arbitrary number of dimensions) in main.cpp.
-The similarity between the brute force calculated graph and the NNDescent graph is calculated in the function compare_results. This function compares the edges of the 2 graphs based on the ids of the vertices and prints the similarity percentage. 
-(Vertex id i refers to the pointer data[i] or i-th datapoint in file reading order)
+## Dataset and Distance Metric
 
-In main, 2 calculations take place. First the brute force graph and then the NN-Descent graph, and later the similarity is calculated.
+Some datasets are available in this repository under the "datasets" directory. The user's distance metric function must be present in the `main.cpp` file. An implementation of Euclidean distance for an arbitrary number of dimensions is already provided in `main.cpp`. The similarity between the brute-force calculated graph and the NN-Descent graph is computed in the `compare_results` function. This function compares the edges of the two graphs based on the IDs of the vertices and prints the similarity percentage. The vertex ID "i" refers to the pointer `data[i]` or the i-th data point in the file reading order.
 
-- **OPTIMIZATIONS:**
+In the main function, two calculations take place. First, the brute-force graph is computed, followed by the NN-Descent graph. Finally, their similarity is calculated.
 
-*Sampling:*
+## Optimizations
 
-Due to the the high computational cost of local joins with a large K, we add a sampling strategy. This involves, marking nodes for comparison and constructing sampled lists of neighbors. User can adjust p (the second argument) to balance between precision and time.
+### Sampling
 
-*Graph Storing:*
+Due to the high computational cost of local joins with a large K, a sampling strategy is introduced. This involves marking nodes for comparison and constructing sampled lists of neighbors. The user can adjust `p` (the second argument) to balance between precision and time.
 
-One more optimazation in the k-nearest neighbors algorithm is that when the dataset size (N) is below or equal to 5000, the program uses a precomputed graph that we store in a file. This precomputed graph is retrieved and used to avoid redundant calculations.
+### Graph Storing
 
-*Distance Used: Euclidean with an optimization.*
+An additional optimization in the k-nearest neighbors algorithm is implemented for cases where the dataset size (N) is below or equal to 5000. In such cases, the program uses a precomputed graph stored in a file, which is retrieved and used to avoid redundant calculations.
 
-We modified the Euclidean distance calculation by focusing on the squared distance. The absolute value of the distance was fount to be less significant in our case, emphasizing its comparison with other distances. This optimization, achieved through precomputing and storing vector norms using the binomial theorem in order to reduce the computational workload during distance calculations.
+### Distance Calculation
 
-*Squares Precomputing:*
+The Euclidean distance calculation has been optimized by focusing on squared distances rather than absolute distances. The absolute value of the distance was found to be less significant in this use case, emphasizing its comparison with other distances. This optimization is achieved by precomputing and storing vector norms using the binomial theorem, reducing the computational workload during distance calculations.
 
-Squares of vector norms are used in the distance calculation later. This optimization saves considerable time, as the squares are computed only once at the beginning, reducing the computational workload during subsequent distance calculations. Additionally, we use the high-performance cblas_sdot function from the CBLAS library, ensuring very fast dot product calculations.
+### Squares Precomputing
 
-*Parallelization:*
-4 methods got parallelized:
-1. calculatePotentialNewNeighbors
-2. pdateGraph
-3. calculateSquares
-4. updateRPGraphOpt
+Squares of vector norms are precomputed and stored for later use in distance calculations. This optimization saves considerable computation time, as squares are calculated once at the beginning, reducing the workload in subsequent distance calculations. Additionally, the high-performance `cblas_sdot` function from the CBLAS library is utilized to ensure efficient dot product calculations.
 
-1. The calculatePotentialNewNeighborsOpt method is designed to take advantage of the available hardware concurrency by creating a number of threads (num_threads) dynamically based on the system's hardware capabilities. Each thread is then assigned a specific amount of the workload by making calls to the function parallelCalculatePotentialNewNeighbors.
-calculatePotentialNewNeighborsOpt is a parallized version of calculatePotentialNewNeighbors. A mutex is used for each datapoint, strategically blocking access to shared data and preventing race conditions. 
+### Parallelization
 
-2. The updateGraph2 method, has a similar threading pattern, but with a more complex locking
-mechanism due to the amount of shared resources.
+Four methods have been parallelized to improve performance: `calculatePotentialNewNeighbors`, `updateGraph`, `calculateSquares`, and `updateRPGraphOpt`.
 
-3. The calculateSquares method efficiently computes the squares of data points in a multi-dimensional space, using parallelization for better performance. This involves multiple threads working simultaneously on different subsets of data points.
-The method dynamically decides the number of threads based on the hardware (num_threads). Each thread handles a specific range of data points, and the parallelSquares function is used concurrently to calculate the squares.
-In the parallelSquares function, a mutex (squareMutex) is used to make sure only one thread accesses the shared squares array at a time. This ensures safe computation, preventing conflicts between threads and making the algorithm more reliable.
+The `calculatePotentialNewNeighborsOpt` method takes advantage of hardware concurrency by dynamically creating a number of threads (`num_threads`) based on the system's hardware capabilities. Each thread is assigned a specific portion of the workload by making calls to the function `parallelCalculatePotentialNewNeighbors`. This method is a parallelized version of `calculatePotentialNewNeighbors`. A mutex is assigned to each data point, blocking access to shared data when necessary and preventing race conditions.
 
-4. The parallelization of updateRPGraphOpt is the simplest one. It doesn't involve the use of mutexes, as shared resources are not at risk of concurrent access, but the concept is that the wordload only gets split in multiple threads to achieve time reduction.
+The `updateGraph2` method follows a similar threading pattern but involves a more complex locking mechanism due to the amount of shared resources.
 
-- **DISCLAIMER:**
+The `calculateSquares` method efficiently computes the squares of data points in a multi-dimensional space using parallelization for better performance. Multiple threads work simultaneously on different subsets of data points. The method dynamically decides the number of threads based on hardware capabilities (`num_threads`). Each thread handles a specific range of data points, while the `parallelSquares` function is executed concurrently to calculate the squares. Within `parallelSquares`, a mutex (`squareMutex`) ensures that only one thread accesses the shared squares array at a time, preventing conflicts between threads and ensuring safe computation.
 
-1. ADTSet is based on the open-source code of the k08 class (https://github.com/chatziko-k08/lecture-code).
-2. cblas_sdot included in CBLAS library
+The parallelization of `updateRPGraphOpt` is relatively simple. It does not involve mutexes, as shared resources are not at risk of concurrent access. Instead, it divides the workload among multiple threads to reduce execution time.
+
+## Disclaimer
+
+The `ADTSet` is based on the open-source code of the k08 class, which can be found at [GitHub Repository](https://github.com/chatziko-k08/lecture-code).  
+The `cblas_sdot` function is included in the CBLAS library.
+
 
 - **HOW TO RUN:**
 
